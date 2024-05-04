@@ -57,31 +57,37 @@ while True:
             number_xcord = sorted(number_xcord)
             number_ycord = sorted(number_ycord)
 
-            rect_min_x, rect_max_x = max(number_xcord[0]-BOUNDARYINT, 0), min(WINDOWSIZEX, number_xcord[-1]+BOUNDARYINT)
-            rect_min_y, rect_max_y = max(number_ycord[0]-BOUNDARYINT, 0), min(number_ycord[-1]+BOUNDARYINT, WINDOWSIZEX)
+            if len(number_xcord) > 0 and len(number_ycord) > 0:
+                rect_min_x = max(number_xcord[0] - BOUNDARYINT, 0)
+                rect_max_x = min(WINDOWSIZEX, number_xcord[-1] + BOUNDARYINT)
 
-            number_xcord = []
-            number_ycord = []
+                rect_min_y = max(number_ycord[0] - BOUNDARYINT, 0)
+                rect_max_y = min(WINDOWSIZEY, number_ycord[-1] + BOUNDARYINT)
 
-            img_arr = np.array(pygame.PixelArray(DISPLAYSURF))[rect_min_x:rect_max_x, rect_min_y:rect_max_y].T.astype(np.float32)
 
-            if IMGSAVE:
-                cv2.imwrite("image.png")
-                image_cnt += 1
 
-            if PREDICT:
+                number_xcord = []
+                number_ycord = []
 
-                image = cv2.resize(img_arr, (28,28))
-                image = np.pad(image, (10,10), 'constant', constant_values = 0)
-                image = cv2.resize(image, (28,28)) / 255
+                img_arr = np.array(pygame.PixelArray(DISPLAYSURF))[rect_min_x:rect_max_x, rect_min_y:rect_max_y].T.astype(np.float32)
 
-                label = str(LABELS[np.argmax(MODEL.predict(image.reshape(1,28,28,1)))])
+                if IMGSAVE:
+                    cv2.imwrite("image.png")
+                    image_cnt += 1
 
-                textSurface = FONT.render(label, True, RED, WHITE)
-                textRecObj = textSurface.get_rect()
-                textRecObj.left, textRecObj.bottom = rect_min_x, rect_max_y
+                if PREDICT:
 
-                DISPLAYSURF.blit(textSurface, textRecObj)
+                    image = cv2.resize(img_arr, (28,28))
+                    image = np.pad(image, (10,10), 'constant', constant_values = 0)
+                    image = cv2.resize(image, (28,28)) / 255
+
+                    label = str(LABELS[np.argmax(MODEL.predict(image.reshape(1,28,28,1)))])
+
+                    textSurface = FONT.render(label, True, RED, WHITE)
+                    textRecObj = textSurface.get_rect()
+                    textRecObj.left, textRecObj.bottom = rect_min_x, rect_max_y
+
+                    DISPLAYSURF.blit(textSurface, textRecObj)
 
         if event.type == KEYDOWN:
             if event.unicode == "n":
